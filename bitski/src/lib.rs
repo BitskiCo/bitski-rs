@@ -67,4 +67,8 @@ impl Bitski {
             BitskiProvider::new(&network, &self.client_id, self.auth_token_provider.clone());
         Ok(provider)
     }
+
+    pub async fn get_access_token(&self) -> Result<String, Error> {
+        self.auth_token_provider.get_access_token().await
+    }
 }

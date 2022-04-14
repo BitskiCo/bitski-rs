@@ -2,9 +2,9 @@
 
 Can auth via Bitski and return a web3 provider.
 
-Can also be run as a CLI tool:
-
-```bash
-cargo run -- execute --network mainnet --method net_version
-"1"
+```rust
+let bitski = Bitski::from_env().expect("Could not initialize");
+let provider = bitski
+    .get_provider(network.as_ref())
+    .expect("Could not get provider");
 ```

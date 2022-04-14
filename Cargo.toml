@@ -1,2 +1,2 @@
 [workspace]
-members = ["bitski", "bitski-cli", "bitski-provider", "bitski-chain-models"]
+members = ["bitski", "bitski-provider", "bitski-chain-models"]
