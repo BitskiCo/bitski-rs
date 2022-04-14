@@ -1,0 +1,2 @@
+[workspace]
+members = ["bitski", "bitski-cli", "bitski-provider", "bitski-chain-models"]
