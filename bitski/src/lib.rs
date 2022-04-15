@@ -47,7 +47,7 @@ impl Bitski {
     }
 
     pub fn from_env() -> Result<Self, Error> {
-        let client_id = std::env::var("CLIENT_ID")?;
+        let client_id = std::env::var("API_KEY").or_else(|_| std::env::var("CLIENT_ID"))?;
         let credential_id = std::env::var("CREDENTIAL_ID");
         let credential_secret = std::env::var("CREDENTIAL_SECRET");
 
