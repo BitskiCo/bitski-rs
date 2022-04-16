@@ -17,10 +17,12 @@ impl Bitski {
         client_id: &dyn ToString,
         credential_id: &dyn ToString,
         client_secret: &dyn ToString,
+        scopes: Option<Vec<String>>,
     ) -> Self {
         let auth_token_provider = Arc::new(ClientCredentialsAccessTokenProvider::new(
             credential_id.to_string(),
             client_secret.to_string(),
+            scopes,
         ));
         Bitski {
             client_id: client_id.to_string(),
@@ -50,11 +52,23 @@ impl Bitski {
         let client_id = std::env::var("API_KEY").or_else(|_| std::env::var("CLIENT_ID"))?;
         let credential_id = std::env::var("CREDENTIAL_ID");
         let credential_secret = std::env::var("CREDENTIAL_SECRET");
+        let scopes: Vec<String> = std::env::var("SCOPES")
+            .unwrap_or_default()
+            .split_terminator(',')
+            .map(|s| s.to_string())
+            .collect();
+        let scopes = match scopes.is_empty() {
+            true => None,
+            false => Some(scopes),
+        };
 
         match (credential_id, credential_secret) {
-            (Ok(credential_id), Ok(credential_secret)) => {
-                Ok(Bitski::new(&client_id, &credential_id, &credential_secret))
-            }
+            (Ok(credential_id), Ok(credential_secret)) => Ok(Bitski::new(
+                &client_id,
+                &credential_id,
+                &credential_secret,
+                scopes,
+            )),
             _ => Ok(Bitski::new_unauthenticated(&client_id)),
         }
     }
