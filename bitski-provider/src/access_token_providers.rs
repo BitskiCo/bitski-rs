@@ -1,6 +1,6 @@
 use anyhow::Error;
 use oauth2::basic::BasicClient;
-use oauth2::{AuthUrl, ClientId, ClientSecret, TokenResponse, TokenUrl};
+use oauth2::{AuthUrl, ClientId, ClientSecret, Scope, TokenResponse, TokenUrl};
 use std::fmt::Debug;
 use web3::futures::future::LocalBoxFuture;
 
@@ -11,10 +11,11 @@ pub trait AccessTokenProvider: Debug {
 #[derive(Clone, Debug)]
 pub struct ClientCredentialsAccessTokenProvider {
     client: BasicClient,
+    scopes: Option<Vec<String>>,
 }
 
 impl ClientCredentialsAccessTokenProvider {
-    pub fn new(client_id: String, client_secret: String) -> Self {
+    pub fn new(client_id: String, client_secret: String, scopes: Option<Vec<String>>) -> Self {
         let client = BasicClient::new(
             ClientId::new(client_id),
             Some(ClientSecret::new(client_secret)),
@@ -22,14 +23,28 @@ impl ClientCredentialsAccessTokenProvider {
             Some(TokenUrl::new("https://account.bitski.com/oauth2/token".to_string()).unwrap()),
         );
 
-        Self { client }
+        Self { client, scopes }
     }
 
-    async fn get_access_token(client: BasicClient) -> Result<String, Error> {
-        let response = client
-            .exchange_client_credentials()
-            .request_async(oauth2::reqwest::async_http_client)
-            .await;
+    async fn get_access_token(
+        client: BasicClient,
+        scopes: Option<Vec<Scope>>,
+    ) -> Result<String, Error> {
+        let response = match scopes {
+            Some(scopes) => {
+                client
+                    .exchange_client_credentials()
+                    .add_scopes(scopes)
+                    .request_async(oauth2::reqwest::async_http_client)
+                    .await
+            }
+            None => {
+                client
+                    .exchange_client_credentials()
+                    .request_async(oauth2::reqwest::async_http_client)
+                    .await
+            }
+        };
         match response {
             Ok(response) => Ok(response.access_token().secret().clone()),
             Err(error) => {
@@ -44,7 +59,11 @@ impl ClientCredentialsAccessTokenProvider {
 impl AccessTokenProvider for ClientCredentialsAccessTokenProvider {
     fn get_access_token(&self) -> LocalBoxFuture<'static, Result<String, Error>> {
         let client = self.client.clone();
-        Box::pin(async move { Self::get_access_token(client).await })
+        let scopes = self
+            .scopes
+            .as_ref()
+            .map(|scopes| scopes.iter().map(|s| Scope::new(s.to_string())).collect());
+        Box::pin(async move { Self::get_access_token(client, scopes).await })
     }
 }
 
