@@ -7,6 +7,8 @@ pub struct Chain {
     pub short_name: String,
     pub chain: String,
     pub chain_id: u64,
+    #[serde(default)]
+    pub rpc: Vec<String>,
 }
 
 const CHAINS_JSON: &str = include_str!("../../chains/chains.json");
