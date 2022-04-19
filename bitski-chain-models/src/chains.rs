@@ -18,7 +18,7 @@ pub fn chains() -> Result<Vec<Chain>, anyhow::Error> {
     Ok(chains)
 }
 
-pub fn chain_from_str(value: &&str) -> Result<Chain, anyhow::Error> {
+pub fn chain_from_str(value: &str) -> Result<Chain, anyhow::Error> {
     let chains = chains()?;
 
     let chain = chains
@@ -28,9 +28,27 @@ pub fn chain_from_str(value: &&str) -> Result<Chain, anyhow::Error> {
                 chain.name.to_lowercase(),
                 chain.chain.to_lowercase(),
                 chain.short_name.to_lowercase(),
+                chain.chain_id.to_string(),
             ]
             .contains(&value.to_lowercase())
         })
         .ok_or_else(|| anyhow::anyhow!("Chain not found"))?;
     Ok(chain)
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_chain_name() {
+        use super::chain_from_str;
+        chain_from_str("eth").expect("could not get eth chain");
+        chain_from_str("matic").expect("could not get matic chain");
+    }
+
+    #[test]
+    fn test_chain_number() {
+        use super::chain_from_str;
+        chain_from_str("1").expect("could not get chain 1");
+        chain_from_str("137").expect("could not get chain 137");
+    }
 }
