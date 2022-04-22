@@ -7,6 +7,7 @@ use bitski_provider::provider::BitskiProvider;
 use std::sync::Arc;
 use web3::Web3;
 
+#[derive(Clone)]
 pub struct Bitski {
     client_id: String,
     auth_token_provider: Arc<dyn AccessTokenProvider + Sync + Send>,
