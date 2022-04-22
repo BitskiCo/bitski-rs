@@ -42,7 +42,7 @@ impl BitskiProvider {
     pub fn new(
         network: &Network,
         client_id: &dyn ToString,
-        auth_token_provider: Arc<dyn AccessTokenProvider>,
+        auth_token_provider: Arc<dyn AccessTokenProvider + Sync + Send>,
     ) -> Self {
         BitskiProvider {
             client_id: client_id.to_string(),

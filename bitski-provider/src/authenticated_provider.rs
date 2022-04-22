@@ -14,7 +14,7 @@ use web3::{helpers, BatchTransport, RequestId, Transport};
 pub struct AuthenticatedProvider {
     pub network: Network,
     pub client_id: String,
-    pub auth_token_provider: Arc<dyn AccessTokenProvider>,
+    pub auth_token_provider: Arc<dyn AccessTokenProvider + Sync + Send>,
     id: Arc<AtomicUsize>,
 }
 
@@ -22,7 +22,7 @@ impl AuthenticatedProvider {
     pub fn new(
         network: Network,
         client_id: &dyn ToString,
-        auth_token_provider: Arc<dyn AccessTokenProvider>,
+        auth_token_provider: Arc<dyn AccessTokenProvider + Sync + Send>,
     ) -> Self {
         AuthenticatedProvider {
             network,
