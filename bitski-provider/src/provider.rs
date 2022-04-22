@@ -2,7 +2,7 @@ use crate::access_token_providers::AccessTokenProvider;
 use crate::authenticated_provider::AuthenticatedProvider;
 use crate::rest_provider::RestProvider;
 use bitski_chain_models::networks::Network;
-use jsonrpc_core::futures::future::LocalBoxFuture;
+use jsonrpc_core::futures::future::BoxFuture;
 use jsonrpc_core::Call;
 use reqwest::header::HeaderValue;
 use reqwest::{header, Client, Url};
@@ -10,7 +10,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use web3::futures::FutureExt;
 use web3::transports::Http;
-use web3::{helpers, RequestId, Transport};
+use web3::{helpers, BatchTransport, RequestId, Transport};
 
 static AUTH_METHODS: &[&str] = &[
     "eth_sendTransaction",
@@ -77,7 +77,7 @@ impl BitskiProvider {
 }
 
 impl Transport for BitskiProvider {
-    type Out = LocalBoxFuture<'static, web3::error::Result<jsonrpc_core::Value>>;
+    type Out = BoxFuture<'static, web3::error::Result<jsonrpc_core::Value>>;
 
     fn prepare(&self, method: &str, params: Vec<serde_json::value::Value>) -> (RequestId, Call) {
         let id = self.id.fetch_add(1, Ordering::AcqRel);
@@ -90,14 +90,26 @@ impl Transport for BitskiProvider {
             Call::MethodCall(method_call)
                 if AUTH_METHODS.contains(&method_call.method.as_str()) =>
             {
-                self.authenticated_provider.send(id, request).boxed_local()
+                self.authenticated_provider.send(id, request).boxed()
             }
             Call::MethodCall(method_call)
                 if REST_METHODS.contains(&method_call.method.as_str()) =>
             {
-                self.rest_provider.send(id, request).boxed_local()
+                self.rest_provider.send(id, request).boxed()
             }
-            _ => self.http_provider.send(id, request).boxed_local(),
+            _ => self.http_provider.send(id, request).boxed(),
         }
+    }
+}
+
+impl BatchTransport for BitskiProvider {
+    type Batch =
+        BoxFuture<'static, web3::error::Result<Vec<web3::error::Result<jsonrpc_core::Value>>>>;
+
+    fn send_batch<T>(&self, requests: T) -> Self::Batch
+    where
+        T: IntoIterator<Item = (RequestId, Call)>,
+    {
+        self.authenticated_provider.send_batch(requests)
     }
 }

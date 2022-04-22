@@ -5,7 +5,7 @@ use serde_json::Value;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use web3::error::TransportError;
-use web3::futures::future::LocalBoxFuture;
+use web3::futures::future::BoxFuture;
 use web3::{helpers, Error, RequestId, Transport};
 
 #[derive(Debug, Clone)]
@@ -88,7 +88,7 @@ impl RestProvider {
 }
 
 impl Transport for RestProvider {
-    type Out = LocalBoxFuture<'static, web3::error::Result<jsonrpc_core::Value>>;
+    type Out = BoxFuture<'static, web3::error::Result<jsonrpc_core::Value>>;
 
     fn prepare(&self, method: &str, params: Vec<Value>) -> (RequestId, Call) {
         let id = self.id.fetch_add(1, Ordering::AcqRel);

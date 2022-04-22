@@ -2,10 +2,10 @@ use anyhow::Error;
 use oauth2::basic::BasicClient;
 use oauth2::{AuthUrl, ClientId, ClientSecret, Scope, TokenResponse, TokenUrl};
 use std::fmt::Debug;
-use web3::futures::future::LocalBoxFuture;
+use web3::futures::future::BoxFuture;
 
 pub trait AccessTokenProvider: Debug {
-    fn get_access_token(&self) -> LocalBoxFuture<'static, Result<String, Error>>;
+    fn get_access_token(&self) -> BoxFuture<'static, Result<String, Error>>;
 }
 
 #[derive(Clone, Debug)]
@@ -57,7 +57,7 @@ impl ClientCredentialsAccessTokenProvider {
 }
 
 impl AccessTokenProvider for ClientCredentialsAccessTokenProvider {
-    fn get_access_token(&self) -> LocalBoxFuture<'static, Result<String, Error>> {
+    fn get_access_token(&self) -> BoxFuture<'static, Result<String, Error>> {
         let client = self.client.clone();
         let scopes = self
             .scopes
@@ -68,13 +68,13 @@ impl AccessTokenProvider for ClientCredentialsAccessTokenProvider {
 }
 
 impl AccessTokenProvider for String {
-    fn get_access_token(&self) -> LocalBoxFuture<'static, Result<String, Error>> {
+    fn get_access_token(&self) -> BoxFuture<'static, Result<String, Error>> {
         Box::pin(std::future::ready(Ok(self.clone())))
     }
 }
 
 impl AccessTokenProvider for () {
-    fn get_access_token(&self) -> LocalBoxFuture<'static, Result<String, Error>> {
+    fn get_access_token(&self) -> BoxFuture<'static, Result<String, Error>> {
         Box::pin(std::future::ready(Err(Error::msg("Not signed in"))))
     }
 }

@@ -5,6 +5,7 @@ use bitski_provider::access_token_providers::{
 };
 use bitski_provider::provider::BitskiProvider;
 use std::sync::Arc;
+use web3::Web3;
 
 pub struct Bitski {
     client_id: String,
@@ -84,5 +85,10 @@ impl Bitski {
 
     pub async fn get_access_token(&self) -> Result<String, Error> {
         self.auth_token_provider.get_access_token().await
+    }
+
+    pub fn get_web3<N: TryInto<Network>>(&self, network: N) -> Result<Web3<BitskiProvider>, Error> {
+        let provider = self.get_provider(network)?;
+        Ok(Web3::new(provider))
     }
 }
