@@ -1,3 +1,11 @@
+#[cfg(feature = "local")]
+mod anvil;
+#[cfg(feature = "local")]
+mod local;
+
+#[cfg(feature = "local")]
+pub use crate::anvil::Anvil;
+
 use anyhow::Error;
 use bitski_chain_models::networks::Network;
 use bitski_provider::access_token_providers::{
@@ -11,6 +19,7 @@ use web3::Web3;
 pub struct Bitski {
     client_id: String,
     auth_token_provider: Arc<dyn AccessTokenProvider + Sync + Send>,
+    rpc_override: Option<String>,
 }
 
 impl Bitski {
@@ -29,7 +38,13 @@ impl Bitski {
         Bitski {
             client_id: client_id.to_string(),
             auth_token_provider,
+            rpc_override: None,
         }
+    }
+
+    /// Set the node url to use, which will override the standard [Network] `rpc_url`.
+    pub fn set_rpc_override(&mut self, rpc_url: String) {
+        self.rpc_override = Some(rpc_url);
     }
 
     /// Sets up Bitski with an existing access token
@@ -38,6 +53,7 @@ impl Bitski {
         Bitski {
             client_id: client_id.to_string(),
             auth_token_provider,
+            rpc_override: None,
         }
     }
 
@@ -47,6 +63,7 @@ impl Bitski {
         Bitski {
             client_id: client_id.to_string(),
             auth_token_provider,
+            rpc_override: None,
         }
     }
 
@@ -54,7 +71,11 @@ impl Bitski {
         let client_id = std::env::var("BITSKI_API_KEY")
             .or_else(|_| std::env::var("BITSKI_CLIENT_ID"))
             .or_else(|_| std::env::var("API_KEY"))
-            .or_else(|_| std::env::var("CLIENT_ID"))?;
+            .or_else(|_| std::env::var("CLIENT_ID"))
+            .map_err(|err| {
+                eprintln!("BITSKI_API_KEY or BITSKI_CLIENT_ID is required.");
+                err
+            })?;
 
         let credential_id =
             std::env::var("BITSKI_CREDENTIAL_ID").or_else(|_| std::env::var("CREDENTIAL_ID"));
@@ -86,9 +107,18 @@ impl Bitski {
     }
 
     pub fn get_provider<N: TryInto<Network>>(&self, network: N) -> Result<BitskiProvider, Error> {
-        let network: Network = network
+        let mut network: Network = network
             .try_into()
             .map_err(|_error| Error::msg("Invalid network"))?;
+
+        // override the rpc url if it was specified
+        let network = if let Some(url) = &self.rpc_override {
+            network.rpc_url = url.to_owned();
+            network
+        } else {
+            network
+        };
+
         let provider =
             BitskiProvider::new(&network, &self.client_id, self.auth_token_provider.clone());
         Ok(provider)

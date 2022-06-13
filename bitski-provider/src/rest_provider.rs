@@ -47,7 +47,7 @@ impl RestProvider {
         #[cfg(feature = "tracing")]
         tracing::debug!(
             "[id:{}] sending request: {:?} to {}",
-            id,
+            "id", // TODO fix
             serde_json::to_string(&request)?,
             url
         );
@@ -72,7 +72,7 @@ impl RestProvider {
         #[cfg(feature = "tracing")]
         tracing::debug!(
             "[id:{}] received response: {:?}",
-            id,
+            "id", // TODO fix
             String::from_utf8_lossy(&response)
         );
         if !status.is_success() {
