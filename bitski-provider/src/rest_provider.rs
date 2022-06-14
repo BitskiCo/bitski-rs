@@ -36,6 +36,8 @@ impl RestProvider {
             Call::MethodCall(ref method_call) => method_call,
             _ => return Err(Error::Internal),
         };
+        #[cfg(feature = "tracing")]
+        let request_id = serde_json::to_string(&method_call.id).unwrap_or_default();
 
         let url = format!(
             "{}/{}?params={}",
@@ -47,7 +49,7 @@ impl RestProvider {
         #[cfg(feature = "tracing")]
         tracing::debug!(
             "[id:{}] sending request: {:?} to {}",
-            "id", // TODO fix
+            request_id,
             serde_json::to_string(&request)?,
             url
         );
@@ -72,7 +74,7 @@ impl RestProvider {
         #[cfg(feature = "tracing")]
         tracing::debug!(
             "[id:{}] received response: {:?}",
-            "id", // TODO fix
+            request_id,
             String::from_utf8_lossy(&response)
         );
         if !status.is_success() {
