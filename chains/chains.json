@@ -116,7 +116,7 @@
     ]
   },
   {
-    "name": "Görli",
+    "name": "Goerli",
     "title": "Ethereum Testnet Görli",
     "chain": "ETH",
     "network": "testnet",
