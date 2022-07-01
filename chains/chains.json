@@ -2412,7 +2412,7 @@
     "name": "Polygon Mainnet",
     "chain": "Polygon",
     "rpc": [
-      "https://polygon-rpc.com/",
+      "https://rpc.ankr.com/polygon",
       "https://rpc-mainnet.matic.network",
       "https://matic-mainnet.chainstacklabs.com",
       "https://rpc-mainnet.maticvigil.com",
