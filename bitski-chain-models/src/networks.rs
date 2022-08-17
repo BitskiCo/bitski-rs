@@ -10,14 +10,17 @@ impl TryFrom<&str> for Network {
     type Error = anyhow::Error;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        if value == "mainnet" {
-            return Ok(Network {
-                rpc_url: "https://api.bitski.com/v1/web3/mainnet".to_owned(),
-                chain_id: 1,
-            });
-        }
-
-        let chain = chains::chain_from_str(value)?;
+        let chain = match value {
+            "mainnet" => {
+                return Ok(Network {
+                    rpc_url: "https://api.bitski.com/v1/web3/mainnet".to_owned(),
+                    chain_id: 1,
+                })
+            }
+            // remap to the short name since 'goerli' isn't in the list
+            "goerli" => chains::chain_from_str("gor"),
+            _ => chains::chain_from_str(value),
+        }?;
 
         Ok(Network {
             rpc_url: format!("https://api.bitski.com/v1/web3/{}", chain.chain_id),
@@ -48,4 +51,16 @@ pub fn new_local_network(
         _ => None,
     };
     node.ok_or_else(|| anyhow::anyhow!("local network not configured"))
+}
+
+#[test]
+fn test_chain_name_try_from() {
+    let n = Network::try_from("goerli").expect("could not get goerli chain");
+    assert_eq!(n.chain_id, 5);
+
+    let n = Network::try_from("mainnet").expect("could not get mainnet chain");
+    assert_eq!(n.chain_id, 1);
+
+    let n = Network::try_from("polygon").expect("could not get polygon chain");
+    assert_eq!(n.chain_id, 137);
 }
