@@ -23,27 +23,28 @@ fn main() {
 
 ## Local node with Anvil
 
-If you would like to use a local node, i.e. during tests, the `local` feature
-needs to be enabled:
+If you would like to use a local node, i.e. during tests, first install
+[Anvil][anvil]. Anvil is an Ethereum node written in Rust that can be used for
+testing RPC calls, contract interactions, etc.
+
+Then, run a local instance of Anvil on `localhost:8545`:
+
+```sh
+anvil
+```
+
+In `Cargo.toml`, enable the `local` feature:
 
 ```toml
 bitski = { git = "https://github.com/BitskiCo/bitski-rs", features = ["local"] }
 ```
 
-This installs [Anvil](https://github.com/foundry-rs/foundry/tree/master/anvil),
-an Ethereum node written in Rust that can be used for testing RPC calls, 
-contract interactions, etc. It can be run directly in your Rust program, so a
-CLI program like Ganache or Hardhat Network aren't needed.
+Finally, write your tests:
 
 ```rust
 fn main() {
-    // Start an Anvil node at `localhost:8545` and initialize a provider
-    let _anvil = bitski::Anvil::new(None).await;
+    // Initialize the Anvil provider
     let bitski = bitski::Bitski::new_local_mode(None);
-
-    // Or, specify a port to run on
-    // let anvil = bitski::Anvil::new(Some(8888)).await;
-    // let bitski = bitski::Bitski::new_local_mode(Some(anvil.rpc_url.clone()));
 
     // Get a web3 provider
     let web3 = bitski
@@ -52,3 +53,5 @@ fn main() {
         .expect("Could not get web3 provider");
 }
 ```
+
+[anvil]: https://github.com/foundry-rs/foundry/tree/master/anvil

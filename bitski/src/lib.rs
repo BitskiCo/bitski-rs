@@ -1,10 +1,5 @@
 #[cfg(feature = "local")]
 mod local;
-#[cfg(feature = "local")]
-mod node;
-
-#[cfg(feature = "local")]
-pub use crate::node::{anvil_config, Anvil};
 
 use anyhow::Error;
 use bitski_chain_models::networks::Network;
