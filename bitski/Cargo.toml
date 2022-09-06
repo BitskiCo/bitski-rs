@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anvil = { git = "https://github.com/foundry-rs/foundry", optional = true }
+anvil = { git = "https://github.com/foundry-rs/foundry", rev = "ccb9aa595019ea6fa60abe2d78710a56ea2a6efa", optional = true }
 anyhow = "1.0"
 bitski-chain-models = { path = "../bitski-chain-models" }
 bitski-provider = { path = "../bitski-provider" }
-ethers = { git = "https://github.com/gakonst/ethers-rs", optional = true }
+ethers = { version = "0.17.0", optional = true }
 jsonrpc-core = "18"
 oauth2 = "4.0"
 reqwest = "0.11"
