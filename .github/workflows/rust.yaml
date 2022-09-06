@@ -1,0 +1,43 @@
+name: Rust
+
+on:
+  pull_request:
+    paths:
+      - "**.json"
+      - "**.rs"
+      - "**.toml"
+  push:
+    branches: [main]
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    container: ghcr.io/bitskico/bitski-internal-sdk:rust
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Configure Cache
+        uses: BitskiCo/cargo-cache-action@v1
+
+      - name: Sync Rustup with rust-toolchain.toml
+        run: rustup show
+
+      - name: Run cargo test
+        run: cargo test --all-features --workspace
+
+      - name: Run cargo clippy
+        uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features --workspace -- --deny warnings
+
+      - name: Run cargo fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
