@@ -44,10 +44,16 @@ impl AuthenticatedProvider {
             .map_err(|_error| web3::error::Error::Internal)?;
 
         let mut headers = header::HeaderMap::new();
+        let user_agent = format!(
+            "{}/{}",
+            option_env!("CARGO_BIN_NAME").unwrap_or(env!("CARGO_PKG_NAME")),
+            env!("CARGO_PKG_VERSION")
+        );
         headers.insert(header::AUTHORIZATION, auth_header_value);
         headers.insert("X-API-Key", HeaderValue::from_str(&client_id).unwrap());
 
         let client = Client::builder()
+            .user_agent(user_agent)
             .default_headers(headers)
             .build()
             .map_err(|_error| web3::error::Error::Internal)?;
