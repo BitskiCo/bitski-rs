@@ -1,3 +1,4 @@
+use crate::USER_AGENT;
 use bitski_chain_models::networks::Network;
 use jsonrpc_core::Call;
 use serde::de::DeserializeOwned;
@@ -18,8 +19,12 @@ pub struct RestProvider {
 
 impl RestProvider {
     pub fn new(network: Network, client_id: &dyn ToString) -> Self {
+        let client = reqwest::ClientBuilder::new()
+            .user_agent(USER_AGENT.clone())
+            .build()
+            .expect("coult not build REST client");
         RestProvider {
-            client: reqwest::Client::new(),
+            client,
             network,
             client_id: client_id.to_string(),
             id: Arc::new(AtomicUsize::new(0)),
