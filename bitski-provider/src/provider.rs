@@ -1,6 +1,7 @@
 use crate::access_token_providers::AccessTokenProvider;
 use crate::authenticated_provider::AuthenticatedProvider;
 use crate::rest_provider::RestProvider;
+use crate::USER_AGENT;
 use bitski_chain_models::networks::Network;
 use jsonrpc_core::futures::future::BoxFuture;
 use jsonrpc_core::Call;
@@ -62,18 +63,13 @@ impl BitskiProvider {
 
         let client_id = client_id.to_string();
         let mut headers = header::HeaderMap::new();
-        let user_agent = format!(
-            "{}/{}",
-            option_env!("CARGO_BIN_NAME").unwrap_or(env!("CARGO_PKG_NAME")),
-            env!("CARGO_PKG_VERSION")
-        );
 
         if url.as_str().contains("api.bitski.com") {
             headers.insert("X-API-Key", HeaderValue::from_str(&client_id).unwrap());
         }
 
         let client = Client::builder()
-            .user_agent(user_agent)
+            .user_agent(USER_AGENT.clone())
             .default_headers(headers)
             .build()
             .expect("Failed to build HTTP client");
