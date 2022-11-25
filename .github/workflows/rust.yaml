@@ -16,7 +16,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    container: ghcr.io/bitskico/bitski-internal-sdk:rust
+    container: ghcr.io/bitskico/rust-sdk
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
