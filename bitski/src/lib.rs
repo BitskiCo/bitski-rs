@@ -1,4 +1,4 @@
-#![doc = include_str!("../../README.md")]
+#![doc = include_str!("../README.md")]
 
 use anyhow::Error;
 use bitski_chain_models::networks::Network;
