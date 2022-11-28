@@ -11,7 +11,7 @@ pub struct Chain {
     pub rpc: Vec<String>,
 }
 
-const CHAINS_JSON: &str = include_str!("../../chains/chains.json");
+const CHAINS_JSON: &str = include_str!("chains.json");
 
 pub fn chains() -> Result<Vec<Chain>, anyhow::Error> {
     let chains = serde_json::from_str(CHAINS_JSON)?;
