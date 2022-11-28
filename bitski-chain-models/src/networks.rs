@@ -29,30 +29,6 @@ impl TryFrom<&str> for Network {
     }
 }
 
-/// Create a new network for a local node. If the `rpc_url` is not None it will override the
-/// default url for the node.
-#[cfg(feature = "local")]
-pub fn new_local_network(
-    network_name: String,
-    rpc_url: Option<String>,
-) -> Result<Network, anyhow::Error> {
-    let node = match network_name.as_str() {
-        "anvil" => {
-            let rpc_url = match rpc_url {
-                Some(url) => url,
-                None => "http://localhost:8545".to_string(),
-            };
-            Some(Network {
-                rpc_url,
-                chain_id: 31337,
-            })
-        }
-        // TODO ganache and hardhat
-        _ => None,
-    };
-    node.ok_or_else(|| anyhow::anyhow!("local network not configured"))
-}
-
 #[test]
 fn test_chain_name_try_from() {
     let n = Network::try_from("goerli").expect("could not get goerli chain");

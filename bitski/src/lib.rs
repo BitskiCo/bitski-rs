@@ -1,10 +1,4 @@
-#[cfg(feature = "local")]
-mod local;
-#[cfg(feature = "local")]
-mod node;
-
-#[cfg(feature = "local")]
-pub use crate::node::{anvil_config, Anvil};
+#![doc = include_str!("../../README.md")]
 
 use anyhow::Error;
 use bitski_chain_models::networks::Network;
@@ -17,9 +11,9 @@ use web3::Web3;
 
 #[derive(Clone)]
 pub struct Bitski {
-    client_id: String,
-    auth_token_provider: Arc<dyn AccessTokenProvider + Sync + Send>,
-    rpc_override: Option<String>,
+    pub client_id: String,
+    pub auth_token_provider: Arc<dyn AccessTokenProvider + Sync + Send>,
+    pub rpc_override: Option<String>,
 }
 
 impl Bitski {
