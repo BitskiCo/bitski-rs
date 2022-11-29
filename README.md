@@ -27,7 +27,7 @@ If you would like to use a local node, i.e. during tests, add a dependency on
 the `bitski-local` package:
 
 ```toml
-bitski = { git = "https://github.com/BitskiCo/bitski-rs" }
+bitski = "0.1.0"
 bitski-local = { git = "https://github.com/BitskiCo/bitski-rs" }
 ```
 
