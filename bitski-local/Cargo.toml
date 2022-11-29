@@ -8,8 +8,8 @@ edition = "2021"
 [dependencies]
 anvil = { git = "https://github.com/foundry-rs/foundry.git", rev = "8e7e0be67f19ba18be8ca83f2545382232e71592" }
 anyhow = "1.0"
-bitski = { path = "../bitski" }
-bitski-chain-models = { path = "../bitski-chain-models" }
-bitski-provider = { path = "../bitski-provider" }
+bitski = { version = "0.1.0", path = "../bitski" }
+bitski-chain-models = { version = "0.1.0", path = "../bitski-chain-models" }
+bitski-provider = { version = "0.1.0", path = "../bitski-provider" }
 ethers = "1.0.1"
 web3 = "0.18"
