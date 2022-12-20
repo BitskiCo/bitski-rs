@@ -4,15 +4,23 @@ on:
   pull_request:
     paths:
       - .github/workflows/rust.yaml
-      - "**.json"
       - "**.rs"
+      - "**.sql"
       - "**.toml"
+      - Cargo.lock
+      - docker-compose.yaml
   push:
     branches: [main]
+    tags: ["*.*.*"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+
+permissions:
+  actions: write # cache
+  checks: write # check result
+  contents: read # git clone
 
 jobs:
   check:
@@ -20,7 +28,12 @@ jobs:
     container: ghcr.io/bitskico/rust-sdk
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Configure Cloudsmith auth
+        run: |
+          git config --global credential.helper store
+          echo "https://token:${{ secrets.CLOUDSMITH_RUST_KEY }}@dl.cloudsmith.io" > ~/.git-credentials
 
       - name: Configure sccache
         uses: actions/github-script@v6
@@ -33,12 +46,15 @@ jobs:
         run: rustup show
 
       - name: Run cargo test
-        run: cargo test --all-features --workspace
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --all-features --workspace
 
       - name: Run cargo clippy
         uses: actions-rs/clippy-check@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           args: --all-features --workspace -- --deny warnings
 
       - name: Run cargo fmt

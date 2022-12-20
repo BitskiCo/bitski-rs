@@ -1,0 +1,32 @@
+name: Security audit
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  push:
+    paths:
+      - .github/workflows/sec-audit.yaml
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
+      - "**/sec-audit.yaml"
+      - "**/audit.toml"
+
+permissions:
+  checks: write # audit result
+  contents: read # git clone
+
+jobs:
+  security_audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure Cloudsmith auth
+        run: |
+          git config --global credential.helper store
+          echo "https://token:${{ secrets.CLOUDSMITH_RUST_KEY }}@dl.cloudsmith.io" > ~/.git-credentials
+
+      - name: Cargo audit
+        uses: actions-rs/audit-check@v1
+        with:
+          token: ${{ github.token }}

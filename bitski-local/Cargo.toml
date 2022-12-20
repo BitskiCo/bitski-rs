@@ -1,15 +1,15 @@
 [package]
 name = "bitski-local"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anvil = { git = "https://github.com/foundry-rs/foundry.git", rev = "8e7e0be67f19ba18be8ca83f2545382232e71592" }
+anvil = { git = "https://github.com/foundry-rs/foundry.git", rev = "9edf6039fc07f2b27dfaf30d526d507b85aac780" }
 anyhow = "1.0"
-bitski = { version = "0.1.0", path = "../bitski" }
-bitski-chain-models = { version = "0.1.0", path = "../bitski-chain-models" }
-bitski-provider = { version = "0.1.0", path = "../bitski-provider" }
-ethers = "1.0.1"
+bitski = { version = "0.2.0", path = "../bitski" }
+bitski-chain-models = { version = "0.2.0", path = "../bitski-chain-models" }
+bitski-provider = { version = "0.2.0", path = "../bitski-provider" }
+ethers = "1.0.2"
 web3 = "0.18"
