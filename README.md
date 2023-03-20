@@ -14,7 +14,7 @@ You can auth via your Bitski credentials, which can be generated at
 If you don't need to send authenticated requests, e.g. for read-only data, you
 can use `BITSKI_API_KEY=local`.
 
-```rust,no_run
+```rust,ignore
 use bitski::Bitski;
 use tokio;
 use web3::Transport;
