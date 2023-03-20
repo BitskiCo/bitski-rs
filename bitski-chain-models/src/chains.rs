@@ -43,7 +43,7 @@ mod tests {
         use super::chain_from_str;
         chain_from_str("eth").expect("could not get eth chain");
         chain_from_str("matic").expect("could not get matic chain");
-        assert!(chain_from_str("goerli").is_err());
+        chain_from_str("goerli").expect("could not get goerli chain");
         chain_from_str("gor").expect("could not get goerli chain");
     }
 
