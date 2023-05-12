@@ -3,6 +3,7 @@ use crate::authenticated_provider::AuthenticatedProvider;
 use crate::rest_provider::RestProvider;
 use crate::USER_AGENT;
 use bitski_chain_models::networks::Network;
+use cached::proc_macro::cached;
 use jsonrpc_core::futures::future::BoxFuture;
 use jsonrpc_core::Call;
 use reqwest::header::HeaderValue;
@@ -40,9 +41,9 @@ pub struct BitskiProvider {
 }
 
 impl BitskiProvider {
-    pub fn new(
+    pub fn new<S: ToString>(
         network: &Network,
-        client_id: &dyn ToString,
+        client_id: &S,
         auth_token_provider: Arc<dyn AccessTokenProvider + Sync + Send>,
     ) -> Self {
         BitskiProvider {
@@ -53,29 +54,29 @@ impl BitskiProvider {
                 auth_token_provider,
             )),
             rest_provider: Arc::new(RestProvider::new(network.clone(), client_id)),
-            http_provider: Self::http_provider(network, client_id),
+            http_provider: http_provider(network.clone(), client_id.to_string()),
             id: Arc::new(AtomicUsize::new(0)),
         }
     }
+}
 
-    fn http_provider(network: &Network, client_id: &dyn ToString) -> Arc<Http> {
-        let url: Url = network.rpc_url.parse().expect("Failed to parse RPC URL");
+#[cached]
+fn http_provider(network: Network, client_id: String) -> Arc<Http> {
+    let url: Url = network.rpc_url.parse().expect("Failed to parse RPC URL");
 
-        let client_id = client_id.to_string();
-        let mut headers = header::HeaderMap::new();
+    let mut headers = header::HeaderMap::new();
 
-        if url.as_str().contains("api.bitski.com") {
-            headers.insert("X-API-Key", HeaderValue::from_str(&client_id).unwrap());
-        }
-
-        let client = Client::builder()
-            .user_agent(USER_AGENT.clone())
-            .default_headers(headers)
-            .build()
-            .expect("Failed to build HTTP client");
-
-        Arc::new(Http::with_client(client, url))
+    if url.as_str().contains("api.bitski.com") {
+        headers.insert("X-API-Key", HeaderValue::from_str(&client_id).unwrap());
     }
+
+    let client = Client::builder()
+        .user_agent(USER_AGENT.clone())
+        .default_headers(headers)
+        .build()
+        .expect("Failed to build HTTP client");
+
+    Arc::new(Http::with_client(client, url))
 }
 
 impl Transport for BitskiProvider {
