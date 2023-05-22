@@ -1,6 +1,6 @@
 [package]
 name = "bitski-provider"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 description = "Bitski Web3 provider"
 license = "Apache-2.0 OR MIT"
@@ -8,6 +8,7 @@ license = "Apache-2.0 OR MIT"
 [dependencies]
 anyhow = "1.0"
 bitski-chain-models = { version = "0.2.1", path = "../bitski-chain-models" }
+cached = "0.43"
 jsonrpc-core = "18"
 oauth2 = "4.3"
 once_cell = "1.17.1"

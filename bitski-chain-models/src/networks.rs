@@ -1,6 +1,6 @@
 use crate::chains;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
 pub struct Network {
     pub rpc_url: String,
     pub chain_id: u64,

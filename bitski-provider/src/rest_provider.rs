@@ -9,6 +9,8 @@ use web3::error::TransportError;
 use web3::futures::future::BoxFuture;
 use web3::{helpers, Error, RequestId, Transport};
 
+use once_cell::sync::Lazy;
+
 #[derive(Debug, Clone)]
 pub struct RestProvider {
     client: reqwest::Client,
@@ -17,14 +19,17 @@ pub struct RestProvider {
     id: Arc<AtomicUsize>,
 }
 
+static CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
+    reqwest::ClientBuilder::new()
+        .user_agent(USER_AGENT.clone())
+        .build()
+        .expect("coult not build REST client")
+});
+
 impl RestProvider {
     pub fn new(network: Network, client_id: &dyn ToString) -> Self {
-        let client = reqwest::ClientBuilder::new()
-            .user_agent(USER_AGENT.clone())
-            .build()
-            .expect("coult not build REST client");
         RestProvider {
-            client,
+            client: CLIENT.clone(),
             network,
             client_id: client_id.to_string(),
             id: Arc::new(AtomicUsize::new(0)),
