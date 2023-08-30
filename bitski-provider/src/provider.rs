@@ -96,7 +96,8 @@ impl Transport for BitskiProvider {
                 self.authenticated_provider.send(id, request).boxed()
             }
             Call::MethodCall(method_call)
-                if REST_METHODS.contains(&method_call.method.as_str()) =>
+                if REST_METHODS.contains(&method_call.method.as_str())
+                    && self.rest_provider.network.rpc_url.contains("bitski.com") =>
             {
                 self.rest_provider.send(id, request).boxed()
             }

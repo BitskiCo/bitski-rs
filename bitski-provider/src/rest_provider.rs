@@ -14,7 +14,7 @@ use once_cell::sync::Lazy;
 #[derive(Debug, Clone)]
 pub struct RestProvider {
     client: reqwest::Client,
-    network: Network,
+    pub network: Network,
     client_id: String,
     id: Arc<AtomicUsize>,
 }
@@ -23,7 +23,7 @@ static CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
     reqwest::ClientBuilder::new()
         .user_agent(USER_AGENT.clone())
         .build()
-        .expect("coult not build REST client")
+        .expect("could not build REST client")
 });
 
 impl RestProvider {
