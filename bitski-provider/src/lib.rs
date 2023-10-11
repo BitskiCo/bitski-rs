@@ -1,7 +1,15 @@
 pub mod access_token_providers;
-pub mod authenticated_provider;
-pub mod provider;
-pub mod rest_provider;
+#[cfg(feature = "ethers")]
+pub mod authenticated_ethers_provider;
+pub mod authenticated_web3_provider;
+
+#[cfg(feature = "ethers")]
+pub mod ethers_provider;
+
+#[cfg(feature = "ethers")]
+pub mod rest_ethers_provider;
+pub mod rest_web3_provider;
+pub mod web3_provider;
 
 use once_cell::sync::Lazy;
 

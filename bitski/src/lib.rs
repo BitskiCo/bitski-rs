@@ -5,7 +5,8 @@ use bitski_chain_models::networks::Network;
 use bitski_provider::access_token_providers::{
     AccessTokenProvider, ClientCredentialsAccessTokenProvider,
 };
-use bitski_provider::provider::BitskiProvider;
+use bitski_provider::ethers_provider::BitskiEthersProvider;
+use bitski_provider::web3_provider::BitskiWeb3Provider;
 use std::sync::Arc;
 use web3::Web3;
 
@@ -100,7 +101,10 @@ impl Bitski {
         }
     }
 
-    pub fn get_provider<N: TryInto<Network>>(&self, network: N) -> Result<BitskiProvider, Error> {
+    pub fn get_web3_provider<N: TryInto<Network>>(
+        &self,
+        network: N,
+    ) -> Result<BitskiWeb3Provider, Error> {
         let mut network: Network = network
             .try_into()
             .map_err(|_error| Error::msg("Invalid network"))?;
@@ -114,7 +118,29 @@ impl Bitski {
         };
 
         let provider =
-            BitskiProvider::new(&network, &self.client_id, self.auth_token_provider.clone());
+            BitskiWeb3Provider::new(&network, &self.client_id, self.auth_token_provider.clone());
+        Ok(provider)
+    }
+
+    #[cfg(feature = "ethers")]
+    pub fn get_ethers_provider<N: TryInto<Network>>(
+        &self,
+        network: N,
+    ) -> Result<BitskiEthersProvider, Error> {
+        let mut network: Network = network
+            .try_into()
+            .map_err(|_error| Error::msg("Invalid network"))?;
+
+        // override the rpc url if it was specified
+        let network = if let Some(url) = &self.rpc_override {
+            network.rpc_url = url.to_owned();
+            network
+        } else {
+            network
+        };
+
+        let provider =
+            BitskiEthersProvider::new(&network, &self.client_id, self.auth_token_provider.clone());
         Ok(provider)
     }
 
@@ -122,8 +148,11 @@ impl Bitski {
         self.auth_token_provider.get_access_token().await
     }
 
-    pub fn get_web3<N: TryInto<Network>>(&self, network: N) -> Result<Web3<BitskiProvider>, Error> {
-        let provider = self.get_provider(network)?;
+    pub fn get_web3<N: TryInto<Network>>(
+        &self,
+        network: N,
+    ) -> Result<Web3<BitskiWeb3Provider>, Error> {
+        let provider = self.get_web3_provider(network)?;
         Ok(Web3::new(provider))
     }
 }

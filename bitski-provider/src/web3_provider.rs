@@ -1,6 +1,6 @@
 use crate::access_token_providers::AccessTokenProvider;
-use crate::authenticated_provider::AuthenticatedProvider;
-use crate::rest_provider::RestProvider;
+use crate::authenticated_web3_provider::AuthenticatedWeb3Provider;
+use crate::rest_web3_provider::RestWeb3Provider;
 use crate::USER_AGENT;
 use bitski_chain_models::networks::Network;
 use cached::proc_macro::cached;
@@ -32,28 +32,28 @@ static REST_METHODS: &[&str] = &[
 ];
 
 #[derive(Clone, Debug)]
-pub struct BitskiProvider {
+pub struct BitskiWeb3Provider {
     pub client_id: String,
-    pub authenticated_provider: Arc<AuthenticatedProvider>,
-    pub rest_provider: Arc<RestProvider>,
+    pub authenticated_provider: Arc<AuthenticatedWeb3Provider>,
+    pub rest_provider: Arc<RestWeb3Provider>,
     pub http_provider: Arc<Http>,
     id: Arc<AtomicUsize>,
 }
 
-impl BitskiProvider {
+impl BitskiWeb3Provider {
     pub fn new<S: ToString>(
         network: &Network,
         client_id: &S,
         auth_token_provider: Arc<dyn AccessTokenProvider + Sync + Send>,
     ) -> Self {
-        BitskiProvider {
+        BitskiWeb3Provider {
             client_id: client_id.to_string(),
-            authenticated_provider: Arc::new(AuthenticatedProvider::new(
+            authenticated_provider: Arc::new(AuthenticatedWeb3Provider::new(
                 network.clone(),
                 client_id,
                 auth_token_provider,
             )),
-            rest_provider: Arc::new(RestProvider::new(network.clone(), client_id)),
+            rest_provider: Arc::new(RestWeb3Provider::new(network.clone(), client_id)),
             http_provider: http_provider(network.clone(), client_id.to_string()),
             id: Arc::new(AtomicUsize::new(0)),
         }
@@ -79,7 +79,7 @@ fn http_provider(network: Network, client_id: String) -> Arc<Http> {
     Arc::new(Http::with_client(client, url))
 }
 
-impl Transport for BitskiProvider {
+impl Transport for BitskiWeb3Provider {
     type Out = BoxFuture<'static, web3::error::Result<jsonrpc_core::Value>>;
 
     fn prepare(&self, method: &str, params: Vec<serde_json::value::Value>) -> (RequestId, Call) {
@@ -106,7 +106,7 @@ impl Transport for BitskiProvider {
     }
 }
 
-impl BatchTransport for BitskiProvider {
+impl BatchTransport for BitskiWeb3Provider {
     type Batch =
         BoxFuture<'static, web3::error::Result<Vec<web3::error::Result<jsonrpc_core::Value>>>>;
 
