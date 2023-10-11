@@ -24,7 +24,7 @@ pub fn chain_from_str(value: &str) -> Result<Chain, anyhow::Error> {
     let chain = chains
         .into_iter()
         .find(|chain| {
-            vec![
+            [
                 chain.name.to_lowercase(),
                 chain.chain.to_lowercase(),
                 chain.short_name.to_lowercase(),

@@ -12,7 +12,7 @@ use web3::{helpers, Error, RequestId, Transport};
 use once_cell::sync::Lazy;
 
 #[derive(Debug, Clone)]
-pub struct RestProvider {
+pub struct RestWeb3Provider {
     client: reqwest::Client,
     pub network: Network,
     client_id: String,
@@ -26,9 +26,9 @@ static CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
         .expect("could not build REST client")
 });
 
-impl RestProvider {
+impl RestWeb3Provider {
     pub fn new(network: Network, client_id: &dyn ToString) -> Self {
-        RestProvider {
+        RestWeb3Provider {
             client: CLIENT.clone(),
             network,
             client_id: client_id.to_string(),
@@ -99,7 +99,7 @@ impl RestProvider {
     }
 }
 
-impl Transport for RestProvider {
+impl Transport for RestWeb3Provider {
     type Out = BoxFuture<'static, web3::error::Result<jsonrpc_core::Value>>;
 
     fn prepare(&self, method: &str, params: Vec<Value>) -> (RequestId, Call) {

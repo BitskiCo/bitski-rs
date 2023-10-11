@@ -12,20 +12,20 @@ use web3::transports::Http;
 use web3::{helpers, BatchTransport, RequestId, Transport};
 
 #[derive(Clone, Debug)]
-pub struct AuthenticatedProvider {
+pub struct AuthenticatedWeb3Provider {
     pub network: Network,
     pub client_id: String,
     pub auth_token_provider: Arc<dyn AccessTokenProvider + Sync + Send>,
     id: Arc<AtomicUsize>,
 }
 
-impl AuthenticatedProvider {
+impl AuthenticatedWeb3Provider {
     pub fn new(
         network: Network,
         client_id: &dyn ToString,
         auth_token_provider: Arc<dyn AccessTokenProvider + Sync + Send>,
     ) -> Self {
-        AuthenticatedProvider {
+        AuthenticatedWeb3Provider {
             network,
             client_id: client_id.to_string(),
             auth_token_provider,
@@ -74,7 +74,7 @@ impl AuthenticatedProvider {
     }
 }
 
-impl Transport for AuthenticatedProvider {
+impl Transport for AuthenticatedWeb3Provider {
     type Out = BoxFuture<'static, web3::error::Result<jsonrpc_core::Value>>;
 
     fn prepare(&self, method: &str, params: Vec<serde_json::value::Value>) -> (RequestId, Call) {
@@ -100,7 +100,7 @@ impl Transport for AuthenticatedProvider {
     }
 }
 
-impl BatchTransport for AuthenticatedProvider {
+impl BatchTransport for AuthenticatedWeb3Provider {
     type Batch =
         BoxFuture<'static, web3::error::Result<Vec<web3::error::Result<jsonrpc_core::Value>>>>;
 
