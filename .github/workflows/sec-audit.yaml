@@ -26,7 +26,6 @@ jobs:
           git config --global credential.helper store
           echo "https://token:${{ secrets.CLOUDSMITH_RUST_KEY }}@dl.cloudsmith.io" > ~/.git-credentials
 
-      - name: Cargo audit
-        uses: actions-rs/audit-check@v1
+      - uses: rustsec/audit-check@v1.4.1
         with:
-          token: ${{ github.token }}
+          token: ${{ secrets.GITHUB_TOKEN }}
