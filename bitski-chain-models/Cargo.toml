@@ -1,6 +1,6 @@
 [package]
 name = "bitski-chain-models"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2021"
 description = "Data for Bitski Rust SDK"
 license = "Apache-2.0 OR MIT"
