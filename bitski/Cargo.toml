@@ -1,13 +1,13 @@
 [package]
 name = "bitski"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 description = "Bitski Rust SDK"
 license = "Apache-2.0 OR MIT"
 
 [dependencies]
 anyhow = "1.0"
-bitski-chain-models = { version = "0.2.2", path = "../bitski-chain-models" }
+bitski-chain-models = { version = "0.2.4", path = "../bitski-chain-models" }
 bitski-provider = { version = "0.3.0", path = "../bitski-provider" }
 jsonrpc-core = "18"
 oauth2 = "4.3"
